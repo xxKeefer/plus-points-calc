@@ -3,6 +3,7 @@ import './App.css';
 import InputField from './InputField';
 import ResultField from './ResultField';
 import NotifyPanel from './NotifyPanel';
+import PointsValue from './PointsValue';
 import 'react-bulma-components/dist/react-bulma-components.min.css';
 
 function App() {
@@ -17,8 +18,13 @@ function App() {
   const [yearsToSave, setYearsToSave] = useState(0);
   const [threeYearsPlus, setThreeYearsPlus] = useState(true);
   const [bonusRequired, setBonusRequired] = useState(true);
+  const [pointsOptions, setPointsOptions] = useState([])
+  const [pointsValue, setPointsValue] = useState(0)
+  const [multiplier, setMultiplier] = useState(10)
 
-
+  useEffect(()=>{
+    setPointsOptions([10,15])
+  },[])
 
   useEffect(()=>{
     if (currentPoints != null && productPoints != null && bonusPoints != null){
@@ -29,12 +35,12 @@ function App() {
 
   useEffect(()=>{
     if (monthlySpend != null) {
-      setMonthlyPoints(monthlySpend*10)
-      setYearlyPoints(monthlySpend*120)
+      setMonthlyPoints(monthlySpend*multiplier)
+      setYearlyPoints(monthlySpend*12*multiplier)
       setMonthsToSave(pointsNeeded / monthlyPoints)
       setYearsToSave(pointsNeeded / yearlyPoints)
     }
-  },[monthlySpend, monthlyPoints, yearlyPoints, pointsNeeded])
+  },[monthlySpend, monthlyPoints, yearlyPoints, pointsNeeded, multiplier])
 
   useEffect(()=>{
     if (monthsToSave != null) {
@@ -44,13 +50,13 @@ function App() {
 
   useEffect(() => {
     let b = (parseInt(bonusPoints));
-    let n = (parseInt(pointsNeeded));
+    let n = (parseInt(productPoints));
     let c = (parseInt(currentPoints))
-    if (bonusPoints != null & (n-c) > 0) {
+    if (bonusPoints != null) {
       //if bonus points required for goal show message
-      setBonusRequired(((n-c)<=b) ? false : true)
+      (n-c>0) && setBonusRequired(((n-c)<=b) ? false : true)
     }
-  }, [bonusPoints, pointsNeeded, currentPoints])
+  }, [bonusPoints, productPoints, currentPoints])
 
 
 
@@ -71,6 +77,11 @@ function App() {
     setMonthlySpend(parseInt(e.target.value, 10));
   }
 
+  function updatePointsValue(e) {
+    setMultiplier(parseInt(e.target.value, 10))
+    setPointsValue(e.target.value)
+  }
+
 
 
   return (
@@ -80,6 +91,11 @@ function App() {
           <div class='container has-text-centered'>
             <h1 class='title'>Plus Points Calculator</h1>
             <h2 class='subtitle'>How long will it take?</h2>
+            <PointsValue 
+            pointsOptions={pointsOptions} 
+            selectedPointsValue={pointsValue} 
+              onChangePointsValue={e => updatePointsValue(e)} 
+            />
           </div>
         </div>
       </section>
