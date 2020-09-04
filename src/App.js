@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import InputField from './InputField';
-import ResultField from './ResultField'
+import ResultField from './ResultField';
+import NotifyPanel from './NotifyPanel';
 import 'react-bulma-components/dist/react-bulma-components.min.css';
 
 function App() {
@@ -14,6 +15,9 @@ function App() {
   const [monthsToSave, setMonthsToSave] = useState(0);
   const [yearlyPoints, setYearlyPoints] = useState(0);
   const [yearsToSave, setYearsToSave] = useState(0);
+  const [threeYearsPlus, setThreeYearsPlus] = useState(true);
+  const [bonusRequired, setBonusRequired] = useState(true);
+
 
 
   useEffect(()=>{
@@ -32,6 +36,23 @@ function App() {
     }
   },[monthlySpend, monthlyPoints, yearlyPoints, pointsNeeded])
 
+  useEffect(()=>{
+    if (monthsToSave != null) {
+      setThreeYearsPlus((parseInt(monthsToSave) >= 36) ? false : true)
+    }
+  },[monthsToSave])
+
+  useEffect(() => {
+    let b = (parseInt(bonusPoints));
+    let n = (parseInt(pointsNeeded));
+    let c = (parseInt(currentPoints))
+    if (bonusPoints != null & (n-c) > 0) {
+      //if bonus points required for goal show message
+      setBonusRequired(((n-c)<=b) ? false : true)
+    }
+  }, [bonusPoints, pointsNeeded, currentPoints])
+
+
 
 
   function updateCurrentPoints(e){
@@ -49,6 +70,7 @@ function App() {
   function updateMonthlySpend(e) {
     setMonthlySpend(parseInt(e.target.value, 10));
   }
+
 
 
   return (
@@ -122,6 +144,18 @@ function App() {
                   />
                 </div>
               </div>
+              <NotifyPanel 
+                colour={'danger'} 
+                msgTitle={'Time is more than three years'}
+                msgBody={'Telstra Plus Points expire after a period of 36 months, you will never be able to save for this item at your current spend level as your points will expire before you get to use them.'}
+                hidden={threeYearsPlus}
+              />
+              <NotifyPanel
+                colour={'success'}
+                msgTitle={'Can be earned with Bonus Points'}
+                msgBody={'If you elect to take the offer with Bonus Points, when they land on your account you will be able to afford the product that you want to redeem.'}
+                hidden={bonusRequired}
+              />
             </div>
           </div>
         </div>
